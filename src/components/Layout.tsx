@@ -1,0 +1,96 @@
+import { useState } from "react";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { useDebounce } from "use-debounce";
+import { useQuery } from "@tanstack/react-query";
+import { searchBooks } from "../api";
+// Layout avec barre de navigation et recherche rapide
+export const Layout = () => {
+  const [text, setText] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const navigate = useNavigate();
+
+  // 1. DEBOUNCE : La variable 'value' ne change que 500ms après la dernière frappe
+  const [debouncedValue] = useDebounce(text, 500);
+
+  // 2. QUERY : Se lance automatiquement quand debouncedValue change
+  const { data } = useQuery({
+    queryKey: ["quick-search", debouncedValue],
+    queryFn: () => searchBooks({ q: debouncedValue }),
+    enabled: debouncedValue.length > 2, // Ne cherche pas si moins de 3 lettres
+  });
+// Gestion du submit du formulaire de recherche rapide
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowSuggestions(false); // Cache la liste
+    if (text) navigate(`/search?q=${text}`);
+  };
+
+  return (
+    <div>
+      <nav style={{ padding: "1rem", background: "#333", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative" }}>
+        <Link to="/" style={{ color: "white", textDecoration: "none", fontWeight: "bold", fontSize: "1.5rem" }}>
+          📚 Ma Biblio
+        </Link>
+        
+        {/* Container de la recherche pour positionner la liste relative à lui */}
+        <div style={{ position: "relative", width: "300px" }}>
+          <form onSubmit={handleSearchSubmit} style={{ display: "flex" }}>
+            <input 
+              type="text" 
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                setShowSuggestions(true);
+              }}
+              placeholder="Recherche rapide..."
+              style={{ width: "100%", padding: "8px", borderRadius: "4px 0 0 4px", border: "none" }}
+            />
+            <button type="submit" style={{ padding: "8px", borderRadius: "0 4px 4px 0", border: "none", cursor: "pointer" }}>🔍</button>
+          </form>
+
+          {/* LISTE DES SUGGESTIONS (Flottante) */}
+          {showSuggestions && data?.docs && data.docs.length > 0 && (
+            <ul style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              background: "white",
+              color: "black",
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              border: "1px solid #ccc",
+              borderRadius: "0 0 4px 4px",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+              zIndex: 1000 // Pour passer au-dessus du reste
+            }}>
+              {data.docs.map((book: any) => {
+                const id = book.key.split("/").pop();
+                return (
+                  <li key={book.key} style={{ borderBottom: "1px solid #eee" }}>
+                    <Link 
+                      to={`/book/${id}`} 
+                      onClick={() => setShowSuggestions(false)} // Ferme la liste au clic
+                      style={{ display: "block", padding: "10px", textDecoration: "none", color: "#333" }}
+                    >
+                      <span style={{ fontWeight: "bold" }}>{book.title}</span>
+                      <br />
+                      <span style={{ fontSize: "0.8rem", color: "#666" }}>{book.author_name?.[0]}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+        
+        <Link to="/search" style={{ color: "#ddd" }}>Recherche Avancée</Link>
+      </nav>
+
+      <main style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+        <Outlet />
+      </main>
+    </div>
+  );
+};
