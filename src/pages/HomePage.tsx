@@ -15,9 +15,9 @@ export const HomePage = () => {
     <div style={{ width: "100%" }}> {/* Force le conteneur à 100% */}
       
       {/* Bannière de titre */}
-      <div style={{ textAlign: "center", marginBottom: "40px", padding: "40px 20px", background: "white", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+      <div style={{ textAlign: "center", marginBottom: "40px", padding: "40px 20px", background: "white", borderRadius: "10px", boxShadow: "0 2px 10px rgba(204, 188, 188, 0.77)" }}>
         <h1 style={{ fontSize: "2.5rem", margin: 0, color: "#333" }}>📚 Bibliothèque Municipale</h1>
-        <p style={{ color: "#666", marginTop: "10px" }}>Découvrez les tendances du moment</p>
+        <p style={{ color: "#3a3838", marginTop: "10px" }}>Découvrez les tendances du moment</p>
       </div>
       
       <h2 style={{ marginBottom: "20px", marginLeft: "10px", borderLeft: "5px solid #333", paddingLeft: "10px" }}>🔥 Tendances du jour</h2>
