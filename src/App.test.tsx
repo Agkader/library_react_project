@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { BookPage } from './pages/BookPage';
 
-// 1. On "Mock" (simule) les appels API pour ne pas dépendre d'internet
+// 1. On Mock les appels API pour ne pas dépendre d'internet
 vi.mock('./api', () => ({
   fetchBookDetail: vi.fn(() => Promise.resolve({
     title: "Harry Potter",
